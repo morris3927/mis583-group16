@@ -9,6 +9,7 @@ model:
   dropout: 0.3
   seq_length: 16  # 每次輸入 16 幀
   use_optical_flow: false  # RGB only 版本
+  use_pretrained: true  # 使用 ImageNet 預訓練權重
 
 training:
   batch_size: 8

@@ -1,0 +1,19 @@
+data:
+  processed_path: "data/processed/tennis"
+  num_classes: 7  # flat_service, slice_service, smash, forehand_flat, backhand, forehand_volley, backhand_volley
+
+model:
+  backbone: "resnet50"
+  hidden_size: 512
+  num_lstm_layers: 2
+  dropout: 0.3
+  seq_length: 16  # 每次輸入 16 幀
+  use_optical_flow: false  # RGB only 版本
+
+training:
+  batch_size: 8
+  epochs: 50
+  learning_rate: 0.001
+  num_workers: 4
+  freeze_backbone: false  # 從頭訓練，不凍結
+  pretrained_weights: null  # 沒有預訓練權重

@@ -1,0 +1,48 @@
+{
+    "serve": {
+        "tennis": [
+            "flat_service",
+            "slice_service"
+        ],
+        "badminton": [
+            "發長球",
+            "發短球"
+        ]
+    },
+    "smash": {
+        "tennis": [
+            "smash"
+        ],
+        "badminton": [
+            "殺球",
+            "點扣",
+            "撲球"
+        ]
+    },
+    "rally": {
+        "tennis": [
+            "forehand_flat",
+            "backhand"
+        ],
+        "badminton": [
+            "長球",
+            "切球",
+            "挑球",
+            "推球",
+            "放小球",
+            "後場抽平球",
+            "平球"
+        ]
+    },
+    "defense_receive": {
+        "tennis": [
+            "forehand_volley",
+            "backhand_volley"
+        ],
+        "badminton": [
+            "擋小球",
+            "防守回抽/挑",
+            "勾球"
+        ]
+    }
+}

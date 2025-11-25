@@ -1,0 +1,1 @@
+experiment_id,timestamp,config_file,dataset,num_classes,epochs,batch_size,learning_rate,use_pretrained,use_optical_flow,best_train_acc,best_train_f1,best_val_acc,best_val_f1,best_test_acc,best_test_f1,model_path,notes

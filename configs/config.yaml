@@ -1,0 +1,15 @@
+data:
+  raw_path: "data/raw"
+  processed_path: "data/processed"
+
+model:
+  backbone: "resnet50"
+  hidden_size: 256
+
+training:
+  batch_size: 16
+  epochs: 50
+  learning_rate: 0.001
+  freeze_backbone: false
+  pretrained_weights: "" # Path to .pth file
+

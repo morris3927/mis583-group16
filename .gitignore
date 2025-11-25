@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# 資料檔案（全部忽略，包含原始和處理後的）
+data/raw/
+data/processed/
+data/annotations/
+
+# 模型權重（重要！）
+weights/**/*.pth
+weights/**/*.pt
+weights/**/*.ckpt
+!weights/**/.gitkeep
+!weights/README.md
+
+# 訓練日誌
+*.log
+training_*.log
+results/**/*.txt
+results/**/*.json
+!results/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# 環境變數
+.env
+
+# 臨時檔案
+*.tmp
+*.bak
+*~

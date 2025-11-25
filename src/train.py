@@ -73,12 +73,12 @@ def log_training_result(experiment_id, config, metrics_dict, model_path):
         'learning_rate': config['training']['learning_rate'],
         'use_pretrained': config['model'].get('use_pretrained', True),
         'use_optical_flow': config['model'].get('use_optical_flow', False),
-        'best_train_acc': metrics_dict.get('train_acc', 0),
-        'best_train_f1': metrics_dict.get('train_f1', 0),
-        'best_val_acc': metrics_dict.get('val_acc', 0),
-        'best_val_f1': metrics_dict.get('val_f1', 0),
-        'best_test_acc': metrics_dict.get('test_acc', 0),
-        'best_test_f1': metrics_dict.get('test_f1', 0),
+        'best_train_acc': f"{metrics_dict.get('train_acc', 0):.4f}",
+        'best_train_f1': f"{metrics_dict.get('train_f1', 0):.4f}",
+        'best_val_acc': f"{metrics_dict.get('val_acc', 0):.4f}",
+        'best_val_f1': f"{metrics_dict.get('val_f1', 0):.4f}",
+        'best_test_acc': f"{metrics_dict.get('test_acc', 0):.4f}",
+        'best_test_f1': f"{metrics_dict.get('test_f1', 0):.4f}",
         'model_path': str(model_path),
         'notes': config.get('notes', '')
     }

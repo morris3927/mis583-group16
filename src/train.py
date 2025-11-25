@@ -135,13 +135,28 @@ def train(config, experiment_name=None):
     print(f"Class mapping: {dataloaders_dict.get('class_to_idx', {})}")
 
     # 3. 初始化模型 (Model Initialization)
-    use_pretrained = config['model'].get('use_pretrained', True)  # 預設為 True
+    use_pretrained = config['model'].get('use_pretrained', True)
+    weights_path = None
+    
+    # 處理 use_pretrained 參數
+    if isinstance(use_pretrained, str):
+        if use_pretrained.lower() == 'imagenet':
+            use_pretrained = True
+        elif use_pretrained.endswith('.pth') or os.path.exists(use_pretrained):
+            weights_path = use_pretrained
+            use_pretrained = False  # 使用本地權重，不從網路下載
+            print(f"Using local backbone weights: {weights_path}")
+        else:
+            # 其他字串情況（如 'true'），嘗試轉為布林值
+            use_pretrained = use_pretrained.lower() == 'true'
+
     model = CNNLSTM(
         num_classes=num_classes,
         hidden_size=config['model']['hidden_size'],
         num_layers=config['model'].get('num_lstm_layers', 2),
-        pretrained=use_pretrained,  # 使用配置決定
-        use_optical_flow=config['model'].get('use_optical_flow', False)
+        pretrained=use_pretrained,
+        use_optical_flow=config['model'].get('use_optical_flow', False),
+        weights_path=weights_path
     ).to(device)
     
     # 如果有指定預訓練權重路徑 (例如 Transfer Learning)，則載入
@@ -169,7 +184,7 @@ def train(config, experiment_name=None):
     )
     
     # 學習率排程器 (Optional)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5, verbose=True)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5)
 
     # 5. 訓練迴圈 (Training Loop)
     best_val_f1 = 0.0

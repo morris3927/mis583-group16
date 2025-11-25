@@ -3,7 +3,7 @@ import torch.nn as nn
 from .backbones import get_backbone
 
 class CNNLSTM(nn.Module):
-    def __init__(self, num_classes=4, hidden_size=256, num_layers=2, pretrained=True, use_optical_flow=False):
+    def __init__(self, num_classes=4, hidden_size=256, num_layers=2, pretrained=True, use_optical_flow=False, weights_path=None):
         """
         CNN-LSTM 模型架構，用於影片事件辨識。
         
@@ -13,6 +13,7 @@ class CNNLSTM(nn.Module):
             num_layers (int): LSTM 層數。
             pretrained (bool): 是否使用預訓練的 Backbone。
             use_optical_flow (bool): 是否使用光流 (False=RGB only 3 channels, True=RGB+Flow 6 channels)。
+            weights_path (str, optional): 本地權重檔案路徑。
         """
         super(CNNLSTM, self).__init__()
         
@@ -21,7 +22,7 @@ class CNNLSTM(nn.Module):
         # 1. 定義 CNN Backbone (ResNet-50)
         # RGB only = 3 channels, RGB + Optical Flow = 6 channels
         input_channels = 6 if use_optical_flow else 3
-        self.backbone, self.feature_dim = get_backbone(pretrained=pretrained, input_channels=input_channels)
+        self.backbone, self.feature_dim = get_backbone(pretrained=pretrained, input_channels=input_channels, weights_path=weights_path)
         
         # 2. 定義 LSTM 層
         # batch_first=True: 輸入格式為 (batch, seq, feature)

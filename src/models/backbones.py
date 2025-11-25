@@ -2,20 +2,28 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 
-def get_backbone(pretrained=True, input_channels=6):
+def get_backbone(pretrained=True, input_channels=6, weights_path=None):
     """
     取得 ResNet-50 Backbone，並修改第一層卷積以支援 6-channel 輸入 (RGB + Optical Flow)。
     
     Args:
         pretrained (bool): 是否載入 ImageNet 預訓練權重。
         input_channels (int): 輸入影像的通道數 (預設為 6: 3 RGB + 3 Optical Flow)。
+        weights_path (str, optional): 本地權重檔案路徑。如果提供，將忽略 pretrained=True 的網路下載。
         
     Returns:
         nn.Module: 修改後的 ResNet-50 特徵提取器 (移除最後的 FC 層)。
         int: 輸出特徵的維度 (ResNet50 為 2048)。
     """
-    # 1. 載入預訓練的 ResNet-50
-    resnet = models.resnet50(pretrained=pretrained)
+    # 1. 載入 ResNet-50
+    if weights_path and os.path.exists(weights_path):
+        print(f"Loading backbone weights from local file: {weights_path}")
+        resnet = models.resnet50(pretrained=False)
+        state_dict = torch.load(weights_path)
+        resnet.load_state_dict(state_dict)
+    else:
+        # 如果沒有本地權重，根據 pretrained 參數決定是否下載
+        resnet = models.resnet50(pretrained=pretrained)
     
     # 2. 修改第一層卷積 (Conv1) 以適應 input_channels
     # 原始 ResNet 的 Conv1 為: nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)

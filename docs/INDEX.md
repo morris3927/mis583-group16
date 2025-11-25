@@ -17,6 +17,12 @@
 - 背景執行與監控
 - 常見問題排解
 
+### 📓 Google Colab 訓練
+→ **[colab_training.ipynb](colab_training.ipynb)** - Colab 專用 Notebook
+- 一鍵掛載 Google Drive
+- 自動安裝環境與訓練
+- 適合沒有 GPU 的開發者
+
 ### 📦 準備資料
 → **[docs/dataset_preparation.md](docs/dataset_preparation.md)** - 資料集下載與整理
 - THETIS 資料集下載方法

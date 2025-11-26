@@ -168,15 +168,29 @@ def train(config, experiment_name=None):
         checkpoint = torch.load(config['training']['pretrained_weights'], map_location=device)
         # 處理可能的 key 不匹配問題 (例如多卡訓練的 'module.' 前綴)
         if 'model_state_dict' in checkpoint:
-            model.load_state_dict(checkpoint['model_state_dict'], strict=False)
+            state_dict = checkpoint['model_state_dict']
         else:
-            model.load_state_dict(checkpoint, strict=False)
+            state_dict = checkpoint
+        
+        # 移除 'module.' 前綴（如果存在，來自 DataParallel）
+        new_state_dict = {}
+        for k, v in state_dict.items():
+            name = k[7:] if k.startswith('module.') else k  # 移除 'module.' 前綴
+            new_state_dict[name] = v
+        
+        model.load_state_dict(new_state_dict, strict=False)
             
     # 凍結 Backbone (如果設定檔要求)
     if config['training'].get('freeze_backbone', False):
         print("Freezing backbone layers...")
         for param in model.backbone.parameters():
             param.requires_grad = False
+    
+    # 多GPU訓練支持
+    if torch.cuda.device_count() > 1:
+        print(f"Using {torch.cuda.device_count()} GPUs for training!")
+        model = nn.DataParallel(model)
+        print(f"GPU IDs: {list(range(torch.cuda.device_count()))}")
 
     # 4. 定義 Loss 與 Optimizer
     criterion = nn.CrossEntropyLoss()
@@ -268,9 +282,13 @@ def train(config, experiment_name=None):
                 'val_f1': val_metrics['f1']
             })
             save_path = save_dir / "best_model.pth"
+            
+            # 保存模型（處理 DataParallel）
+            model_to_save = model.module if isinstance(model, nn.DataParallel) else model
+            
             torch.save({
                 'epoch': epoch,
-                'model_state_dict': model.state_dict(),
+                'model_state_dict': model_to_save.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'best_f1': best_val_f1,
                 'config': config
@@ -293,7 +311,13 @@ def train(config, experiment_name=None):
         # 載入最佳模型
         best_model_path = save_dir / "best_model.pth"
         checkpoint = torch.load(best_model_path, map_location=device)
-        model.load_state_dict(checkpoint['model_state_dict'])
+        
+        # 處理 DataParallel
+        if isinstance(model, nn.DataParallel):
+            model.module.load_state_dict(checkpoint['model_state_dict'])
+        else:
+            model.load_state_dict(checkpoint['model_state_dict'])
+        
         model.eval()
         
         # 在測試集上推論

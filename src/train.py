@@ -275,11 +275,53 @@ def train(config, experiment_name=None):
             }, save_path)
             print(f"New best model saved to {save_path} (F1: {best_val_f1:.4f})")
     
-    # 訓練完成，記錄結果
+    # 訓練完成
     print("\n" + "="*60)
     print("訓練完成！")
     print(f"最佳驗證 F1: {best_val_f1:.4f}")
     print("="*60)
+    
+    # 在測試集上評估（如果存在）
+    test_loader = dataloaders_dict.get('test')
+    if test_loader is not None:
+        print("\n" + "="*60)
+        print("正在測試集上評估最佳模型...")
+        print("="*60)
+        
+        # 載入最佳模型
+        best_model_path = save_dir / "best_model.pth"
+        checkpoint = torch.load(best_model_path, map_location=device)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        model.eval()
+        
+        # 在測試集上推論
+        test_preds = []
+        test_labels = []
+        
+        with torch.no_grad():
+            test_pbar = tqdm(test_loader, desc="Testing")
+            for batch in test_pbar:
+                frames, labels = batch
+                frames = frames.to(device)
+                labels = labels.to(device)
+                
+                outputs = model(frames)
+                preds = torch.argmax(outputs, dim=1)
+                test_preds.extend(preds.cpu().numpy())
+                test_labels.extend(labels.cpu().numpy())
+        
+        # 計算測試指標
+        test_metrics = calculate_metrics(np.array(test_labels), np.array(test_preds))
+        
+        print(f"\n測試結果: Acc={test_metrics['accuracy']:.4f}, F1={test_metrics['f1']:.4f}")
+        
+        # 更新 best_metrics
+        best_metrics.update({
+            'test_acc': test_metrics['accuracy'],
+            'test_f1': test_metrics['f1']
+        })
+    else:
+        print("\n⚠️  未找到測試集，跳過測試評估")
     
     # 記錄到 CSV
     log_training_result(

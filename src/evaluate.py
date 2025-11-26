@@ -27,23 +27,33 @@ def evaluate(model_path, test_data_dir, config_path, output_dir="results"):
     os.makedirs(output_dir, exist_ok=True)
 
     # 2. 載入資料
-    test_dataset = BadmintonDataset(
-        data_dir=test_data_dir,
+    from data.dataset import VideoEventDataset
+    
+    test_dataset = VideoEventDataset(
+        processed_dir=test_data_dir,
+        seq_length=config['model'].get('seq_length', 16),
         transform=None
     )
+    
+    num_classes = len(test_dataset.class_to_idx)
+    class_names = list(test_dataset.class_to_idx.keys())
+    
     test_loader = DataLoader(
         test_dataset, 
         batch_size=config['training']['batch_size'], 
         shuffle=False, 
-        num_workers=4
+        num_workers=config['training'].get('num_workers', 4)
     )
     print(f"Test set size: {len(test_dataset)}")
+    print(f"Classes: {class_names}")
 
     # 3. 載入模型
     model = CNNLSTM(
-        num_classes=4,
+        num_classes=num_classes,
         hidden_size=config['model']['hidden_size'],
-        pretrained=False # 評估時不需要下載 ImageNet 權重，因為會載入 checkpoint
+        num_layers=config['model'].get('num_lstm_layers', 2),
+        pretrained=False,  # 評估時不需要下載 ImageNet 權重，因為會載入 checkpoint
+        use_optical_flow=config['model'].get('use_optical_flow', False)
     ).to(device)
     
     print(f"Loading model from {model_path}")
@@ -61,8 +71,11 @@ def evaluate(model_path, test_data_dir, config_path, output_dir="results"):
     
     with torch.no_grad():
         for batch in tqdm(test_loader, desc="Evaluating"):
-            inputs, labels = batch[0].to(device), batch[-1].to(device)
-            outputs = model(inputs)
+            frames, labels = batch
+            frames = frames.to(device)
+            labels = labels.to(device)
+            
+            outputs = model(frames)
             preds = torch.argmax(outputs, dim=1)
             
             all_preds.extend(preds.cpu().numpy())
@@ -77,8 +90,7 @@ def evaluate(model_path, test_data_dir, config_path, output_dir="results"):
     print(f"Recall:    {metrics['recall']:.4f}")
     
     # 6. 詳細報告 (Classification Report)
-    target_names = ['Serve', 'Rally', 'Winner', 'Dead'] # 需與 Dataset 定義一致
-    report = classification_report(all_labels, all_preds, target_names=target_names)
+    report = classification_report(all_labels, all_preds, target_names=class_names)
     print("\n=== Classification Report ===")
     print(report)
     
@@ -88,7 +100,7 @@ def evaluate(model_path, test_data_dir, config_path, output_dir="results"):
     # 7. 混淆矩陣 (Confusion Matrix)
     cm = confusion_matrix(all_labels, all_preds)
     plt.figure(figsize=(10, 8))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=target_names, yticklabels=target_names)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
     plt.xlabel('Predicted')
     plt.ylabel('True')
     plt.title('Confusion Matrix')

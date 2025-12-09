@@ -47,6 +47,7 @@ badminton_action_to_event:
   wrist_smash: 0
   
   # Event 1: Net Play (網前/小球)
+  netplay: 1  # 簡化的資料夾名稱
   net_shot: 1
   return_net: 1
   rush: 1
@@ -54,6 +55,7 @@ badminton_action_to_event:
   cross_court_net_shot: 1
   
   # Event 2: Rally (後場/對打)
+  rally: 2  # 簡化的資料夾名稱
   clear: 2
   lob: 2
   defensive_return_lob: 2
@@ -65,6 +67,7 @@ badminton_action_to_event:
   passive_drop: 2
   
   # Event 3: Serve (發球)
+  serve: 3  # 簡化的資料夾名稱
   short_service: 3
   long_service: 3
 

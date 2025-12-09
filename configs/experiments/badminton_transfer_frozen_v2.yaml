@@ -1,0 +1,24 @@
+data:
+  processed_path: "data/processed/badminton"
+  num_classes: 4  # 事件分類：Smash, Net Play, Rally, Serve
+  use_event_labels: true  # 使用事件標籤
+  sport: "badminton"
+
+model:
+  backbone: "resnet50"
+  hidden_size: 512
+  num_lstm_layers: 3
+  dropout: 0.5  # 🔑 增加 dropout (從 0.3 到 0.5)
+  seq_length: 16
+  use_optical_flow: false
+  use_pretrained: true
+
+training:
+  batch_size: 16
+  epochs: 50
+  learning_rate: 0.0001  # 🔑 降低學習率 (從 0.001 到 0.0001)
+  num_workers: 4
+  freeze_backbone: true
+  pretrained_weights: "weights/experiments/tennis_4event_baseline_20251126_072103/best_model.pth"
+
+notes: "Transfer learning v2 - Lower LR (0.0001) and higher dropout (0.5) to reduce overfitting"

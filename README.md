@@ -29,7 +29,7 @@
 ## 📂 專案架構
 
 ```
-ML_final_project/
+mis583-group16/
 ├── data/                          # 資料存放區
 │   ├── processed/                 # 預處理後的資料（16幀序列）
 │   │   ├── tennis/                # 網球資料（THETIS）
@@ -308,12 +308,6 @@ python src/train.py --config configs/experiments/badminton_transfer_finetune.yam
 - **THETIS Dataset**: https://github.com/THETIS-dataset/dataset
 - **ShuttleSet Dataset**: https://github.com/wywyWang/CoachAI-Projects/tree/main/ShuttleSet
 
-如引用本專案，請參考：
-```
-謝睿恩, 楊翊愷 (2025). Cross-Sport Event Recognition: Transfer Learning from Tennis to Badminton. 
-深度學習期末專案, 國立中山大學.
-GitHub: https://github.com/morris3927/ML_final_project
-```
 
 ## 🔮 未來工作
 
@@ -338,6 +332,6 @@ GitHub: https://github.com/morris3927/ML_final_project
 
 ---
 
-**專案倉庫：** https://github.com/morris3927/ML_final_project
+**專案倉庫：** https://github.com/morris3927/mis583-group16
 
 **最後更新：** 2025年12月10日
